@@ -34,6 +34,10 @@ namespace Meryuhi.Rendering
                 .Select(mode => ($"_{nameof(FullScreenFog.mode).ToUpper()}_{mode.ToString().ToUpper()}", mode)).ToArray();
             private static readonly int MainParamsShaderID = Shader.PropertyToID("_MainParams");
 
+            private static readonly (string Name, FullScreenFogColorMode Value)[] ColorModeShaderKeywords = Enum.GetValues(typeof(FullScreenFogColorMode))
+                .Cast<FullScreenFogColorMode>()
+                .Select(mode => ($"_{nameof(FullScreenFog.colorMode).ToUpper()}_{mode.ToString().ToUpper()}", mode)).ToArray();
+
             private static readonly (string Name, FullScreenFogNoiseMode Value)[] NoiseModeShaderKeywords = Enum.GetValues(typeof(FullScreenFogNoiseMode))
                 .Cast<FullScreenFogNoiseMode>()
                 .Select(mode => ($"_{nameof(FullScreenFog.noiseMode).ToUpper()}_{mode.ToString().ToUpper()}", mode)).ToArray();
@@ -90,9 +94,6 @@ namespace Meryuhi.Rendering
                 {
                     CoreUtils.SetKeyword(material, Name, Value == mode);
                 }
-                var color = fog.color.value;
-                color.a = fog.intensity.value;
-                material.color = color;
 
                 var densityMode = fog.densityMode.value;
                 foreach (var (Name, Value) in ModeShaderKeywords)
@@ -130,11 +131,27 @@ namespace Meryuhi.Rendering
                 }
                 material.SetVector(MainParamsShaderID, fogParams);
 
+                var color = fog.color.value;
+                color.a = fog.intensity.value;
+                material.color = color;
+
+                var colorMode = fog.colorMode.value;
+                foreach (var (Name, Value) in ColorModeShaderKeywords)
+                {
+                    CoreUtils.SetKeyword(material, Name, Value == colorMode);
+                }
+
+                if (FullScreenFog.UseSunColor(colorMode))
+                {
+                    material.SetColor("_SunColor", fog.sunColor.value);
+                    material.SetFloat("_SunFalloff", fog.sunFalloff.value);
+                }
+
+                var noiseMode = fog.noiseMode.value;
                 foreach (var (Name, Value) in NoiseModeShaderKeywords)
                 {
-                    CoreUtils.SetKeyword(material, Name, Value == fog.noiseMode.value);
+                    CoreUtils.SetKeyword(material, Name, Value == noiseMode);
                 }
-                var noiseMode = fog.noiseMode.value;
                 if (FullScreenFog.UseNoiseTex(noiseMode))
                 {
                     material.SetTexture(NoiseTexShaderID, fog.noiseTexture.value == null ? Texture2D.whiteTexture : fog.noiseTexture.value);

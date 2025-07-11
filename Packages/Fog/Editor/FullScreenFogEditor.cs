@@ -8,13 +8,17 @@ namespace Meryuhi.Rendering
     {
         SerializedDataParameter _mode;
         SerializedDataParameter _intensity;
-        SerializedDataParameter _color;
         SerializedDataParameter _densityMode;
         SerializedDataParameter _startLine;
         SerializedDataParameter _endLine;
         SerializedDataParameter _startHeight;
         SerializedDataParameter _endHeight;
         SerializedDataParameter _density;
+
+        SerializedDataParameter _colorMode;
+        SerializedDataParameter _color;
+        SerializedDataParameter _sunColor;
+        SerializedDataParameter _sunFalloff;
 
         SerializedDataParameter _noiseMode;
         SerializedDataParameter _noiseTexture;
@@ -29,13 +33,17 @@ namespace Meryuhi.Rendering
 
             _mode = Unpack(o.Find(x => x.mode));
             _intensity = Unpack(o.Find(x => x.intensity));
-            _color = Unpack(o.Find(x => x.color));
             _densityMode = Unpack(o.Find(x => x.densityMode));
             _startLine = Unpack(o.Find(x => x.startLine));
             _endLine = Unpack(o.Find(x => x.endLine));
             _startHeight = Unpack(o.Find(x => x.startHeight));
             _endHeight = Unpack(o.Find(x => x.endHeight));
             _density = Unpack(o.Find(x => x.density));
+
+            _colorMode = Unpack(o.Find(x => x.colorMode));
+            _color = Unpack(o.Find(x => x.color));
+            _sunColor = Unpack(o.Find(x => x.sunColor));
+            _sunFalloff = Unpack(o.Find(x => x.sunFalloff));
 
             _noiseMode = Unpack(o.Find(x => x.noiseMode));
             _noiseTexture = Unpack(o.Find(x => x.noiseTexture));
@@ -50,8 +58,6 @@ namespace Meryuhi.Rendering
             PropertyField(_mode);
 
             PropertyField(_intensity);
-
-            PropertyField(_color);
 
             var densityMode = (FullScreenFogDensityMode)_densityMode.value.intValue;
             PropertyField(_densityMode);
@@ -75,6 +81,17 @@ namespace Meryuhi.Rendering
             if (FullScreenFog.UseIntensity(densityMode))
             {
                 PropertyField(_density);
+            }
+
+            var colorMode = (FullScreenFogColorMode)_colorMode.value.intValue;
+            PropertyField(_colorMode);
+
+            PropertyField(_color);
+
+            if (FullScreenFog.UseSunColor(colorMode))
+            {
+                PropertyField(_sunColor);
+                PropertyField(_sunFalloff);
             }
 
             var noiseMode = (FullScreenFogNoiseMode)_noiseMode.value.intValue;

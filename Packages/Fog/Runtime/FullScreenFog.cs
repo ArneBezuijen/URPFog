@@ -72,6 +72,35 @@ namespace Meryuhi.Rendering
     }
 
     /// <summary>
+    /// Color mode
+    /// </summary>
+    public enum FullScreenFogColorMode
+    {
+        /// <summary>
+        /// Use a constant color for all fog.
+        /// </summary>
+        Single,
+        /// <summary>
+        /// Using a secondary color when looking at the sun, as a crude but cheap apporximation of atmospheric scatering.
+        /// </summary>
+        Dual,
+    }
+
+    /// <summary>
+    /// A <see cref="VolumeParameter"/> that holds a <see cref="FullScreenFogColorMode"/> value.
+    /// </summary>
+    [Serializable]
+    public sealed class FullScreenFogColorModeParameter : VolumeParameter<FullScreenFogColorMode>
+    {
+        /// <summary>
+        /// Create a new <see cref="FullScreenFogColorModeParameter"/> instance.
+        /// </summary>
+        /// <param name="value">The initial value to store in the parameter.</param>
+        /// <param name="overrideState">The initial override state for the parameter.</param>
+        public FullScreenFogColorModeParameter(FullScreenFogColorMode value, bool overrideState = false) : base(value, overrideState) { }
+    }
+
+    /// <summary>
     /// Noise mode
     /// </summary>
     public enum FullScreenFogNoiseMode
@@ -125,11 +154,6 @@ namespace Meryuhi.Rendering
         [Tooltip("Amount of the fog.")]
         public ClampedFloatParameter intensity = new(0f, 0f, 1f);
         /// <summary>
-        /// Fog color.
-        /// </summary>
-        [Tooltip("Fog color.")]
-        public ColorParameter color = new(Color.gray, true, false, true);
-        /// <summary>
         /// Density mode of the fog.
         /// </summary>
         [Tooltip("Density mode of the fog.")]
@@ -165,6 +189,28 @@ namespace Meryuhi.Rendering
         public ClampedFloatParameter density = new (0.1f, 0f, 1f);
         internal static bool UseIntensity(FullScreenFogDensityMode mode) => mode == FullScreenFogDensityMode.Exponential || mode == FullScreenFogDensityMode.ExponentialSquared;
 
+        /// <summary>
+        /// Color mode for the fog.
+        /// </summary>
+        [Tooltip("Color mode for the fog.")]
+        public FullScreenFogColorModeParameter colorMode = new(FullScreenFogColorMode.Single);
+        /// <summary>
+        /// Fog color.
+        /// </summary>
+        [Tooltip("Fog color.")]
+        public ColorParameter color = new(Color.gray, true, false, true);
+        /// <summary>
+        /// Fog color when looking towards the sun.
+        /// </summary>
+        [Tooltip("Fog color when looking towards the sun.")]
+        public ColorParameter sunColor = new(Color.white, true, false, true);
+        internal static bool UseSunColor(FullScreenFogColorMode colorMode) => colorMode == FullScreenFogColorMode.Dual;
+        /// <summary>
+        /// Fog sun color falloff.
+        /// </summary>
+        [Tooltip("Fog sun color falloff.")]
+        public FloatParameter sunFalloff = new(2f);
+       
         [Header("Noise")]
         /// <summary>
         /// Noise mode for the fog.
